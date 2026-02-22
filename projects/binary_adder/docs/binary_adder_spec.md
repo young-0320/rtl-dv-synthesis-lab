@@ -1,44 +1,17 @@
-**Binary Adder spec**
+**Binary Adder Spec**
 
+**Module Name:** 64-bit Unsigned Binary Adder
 
-
-work flow
-
-1. 헤더 파일에 half, full adder golen model 구현
-2. 
-
-**[덧셈기 아키텍처]**
-
-* **[작업 파이프라인 구축 방향성]**
-
-1. **Golden Model 기반 셀프 체킹 테스트벤치 작성 (검증):**
-   C/C++ 또는 파이썬을 이용해 입력 자극(Stimulus)에 대한 정확한 정답지(Golden Reference)를 먼저 생성하십시오. 베릴로그 테스트벤치 내에서 `$random` 시스템 태스크를 사용해 수만 개의 난수 입력 조합(Corner case 포함)을 DUT(Device Under Test)에 밀어 넣고, 결과를 정답지와 자동으로 비교하여 에러 발생 시 시뮬레이션을 멈추도록(`$stop`, `$display`) 코딩해야 합니다.
-2. **명확한 설계 제약(Constraints) 설정 및 합성 (합성):**
-   목표 클럭 주파수를 SDC(Synopsys Design Constraints) 파일 등을 통해 엄격하게 설정하십시오.
-3. **타이밍 및 리소스 리포트 분석 (최적화):**
-   합성 후 툴이 뱉어내는 Report를 반드시 확인해야 합니다. Worst Negative Slack (WNS)이 0 이상(Positive)인지 확인하여 셋업 타임 위반이 없는지 검증하고, 설계한 아키텍처(RCA vs CLA)에 따라 사용된 LUT(Look-Up Table)나 게이트 카운트가 논리적으로 타당한지 대조하는 과정을 거쳐야 합니다.
-
-
-half adder
-
-
-
-| **십진수 덧셈 결과** | **이진수 형태** | **분리 해석**                 | **하드웨어 매핑** |
-| -------------------------- | --------------------- | ----------------------------------- | ----------------------- |
-| **0**                | `00`                | Carry=**0** , Sum=**0** | 모두 0일 때             |
-| **1**                | `01`                | Carry=**0** , Sum=**1** | 둘 중 하나만 1일 때     |
-| **2**                | `10`                | Carry=**1** , Sum=**0** | 둘 중 두 개가 1일 때    |
-|                            |                       |                                     |                         |
-
-
-
-
-full adder
-
-
-| **십진수 덧셈 결과** | **이진수 형태** | **분리 해석**                 | **하드웨어 매핑** |
-| -------------------------- | --------------------- | ----------------------------------- | ----------------------- |
-| **0**                | `00`                | Carry=**0** , Sum=**0** | 모두 0일 때             |
-| **1**                | `01`                | Carry=**0** , Sum=**1** | 셋 중 하나만 1일 때     |
-| **2**                | `10`                | Carry=**1** , Sum=**0** | 셋 중 두 개가 1일 때    |
-| **3**                | `11`                | Carry=**1** , Sum=**1** | 셋 다 1일 때            |
+* **Architecture:** Combinational Logic (0-cycle latency)
+* **Data Type:** Unsigned only
+* **Input Ports:**
+  * `a [63:0]`: 64-bit unsigned operand A
+  * `b [63:0]`: 64-bit unsigned operand B
+* **Output Ports:**
+  * `sum [63:0]`: lower 64-bit addition result
+  * `c_out`: carry-out bit from bit 63
+* **Functional Definition:**
+  * `{c_out, sum} = a + b`
+* **Notes:**
+  * No subtraction support
+  * No signed overflow flag output

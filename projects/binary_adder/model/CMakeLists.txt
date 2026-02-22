@@ -1,6 +1,6 @@
-# model/cpp/CMakeList
-# model/cpp 파일을 라이브러리화
-# add_library(binary adder STATIC fir_1d_ref.cpp)
+# model/CMakeList
+# model 파일을 라이브러리화
+# add_library(basic adder STATIC fir_1d_ref.cpp)
 
 # target_include_directories(fir_1d_ref
 #     PUBLIC 
