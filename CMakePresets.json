@@ -1,0 +1,24 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "default-build",
+            "displayName": "Default Build (Project Root)",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "BUILD__TESTS": "ON"
+            }
+        },
+        {
+            "name": "binary-adder",
+            "displayName": "Binary Adder",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/projects/binary_adder/sim/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        }
+        
+    ]
+}
