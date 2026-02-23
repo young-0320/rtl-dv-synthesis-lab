@@ -1,3 +1,6 @@
+`timescale 1ns / 1ps
+
+
 module rca_64bit (
     input [63:0] a,
     b,

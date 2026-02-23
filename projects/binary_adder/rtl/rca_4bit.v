@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 
 module rca_4bit (
     input [3:0] a,

@@ -1,3 +1,6 @@
+`timescale 1ns / 1ps
+
+
 module rca_32bit (
     input [31:0] a,
     b,

@@ -1,3 +1,6 @@
+`timescale 1ns / 1ps
+
+
 module rca_8bit (
     input [7:0] a,
     b,
