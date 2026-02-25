@@ -13,7 +13,7 @@ module test_half_adder ();
 
   initial #100 $finish;
   initial begin
-    $dumpfile("sim/build/output/iverilog/test_half_adder.vcd");
+    $dumpfile("projects/binary_adder/sim/build/output/iverilog/test_half_adder.vcd");
     $dumpvars(0, test_half_adder);
     $display("a b | c_out sum");
     $display("-------------");

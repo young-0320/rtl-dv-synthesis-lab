@@ -39,3 +39,25 @@
 
 # debug information files
 *.dwo
+
+# Vivado generated files
+**/build/vivado/
+**/.Xil/
+**/*.cache/
+**/*.gen/
+**/*.hw/
+**/*.ip_user_files/
+**/*.runs/
+**/*.sim/
+**/*.srcs/
+**/xsim.dir/
+**/webtalk/
+vivado*.jou
+vivado*.log
+webtalk*.jou
+webtalk*.log
+xvlog.log
+xelab.log
+xsim.log
+*.wdb
+*.wcfg

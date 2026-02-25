@@ -11,8 +11,10 @@ module test_rca_64bit ();
 
   reg [63:0] a_vec, b_vec, sum_exp;
   reg c_out_exp;
-  integer c_out_raw;
 
+  // c_out_raw은 벡터 파일에서 읽은 c_out 값을 임시로 저장하는 정수. 0혹은 1
+  integer c_out_raw;
+  // 벡터 파일에서 읽은 데이터를 처리하는 데 사용되는 변수들입니다.
   integer fd, n, err_cnt, line_no;
 
   rca_64bit uut (
@@ -29,8 +31,10 @@ module test_rca_64bit ();
     fd = $fopen("projects/binary_adder/sim/vector/golden_vectors.hex", "r");
     if (fd == 0) $fatal(1, "cannot open vector file");
 
+    // n은 fscanf가 성공적으로 읽은 항목 수를 나타냄
     n = $fscanf(fd, "%h %h %h %h", a_vec, b_vec, sum_exp, c_out_raw);
     while (n == 4) begin
+      // 에러 체크 로직
       if ((c_out_raw != 0) && (c_out_raw != 1))
         $fatal(1, "Invalid c_out value near line %0d: %0h", line_no + 1, c_out_raw);
 
