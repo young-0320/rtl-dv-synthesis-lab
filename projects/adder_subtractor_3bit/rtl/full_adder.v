@@ -6,6 +6,6 @@ module full_adder (
     output c_out,
     sum
 );
-assign sum = a ^ b ^ c_in;
-assign c_out = (a & b) | (b & c_in) | (a & c_in); 
+  assign sum   = a ^ b ^ c_in;
+  assign c_out = (a & b) | (b & c_in) | (a & c_in);
 endmodule
