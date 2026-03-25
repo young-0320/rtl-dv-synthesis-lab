@@ -28,8 +28,9 @@ module adder_subtractor_3bit #(
     end
   endgenerate
 
-  // ADD에서는 carry 발생, SUB에서는 borrow 발생을 표시한다.
-  assign c_out  = mode ? ~carry[N] : carry[N];
+  // LD5는 SUB 결과가 음수일 때만 켜지도록 사용한다.
+  // unsigned A-B에서 음수 여부는 borrow 발생 여부와 같다.
+  assign c_out  = mode ? ~carry[N] : 1'b0;
   // ADD에서는 확장 캐리 비트, SUB에서는 4비트 2의 보수 결과의 부호 비트가 된다.
   assign sum[N] = mode ? ~carry[N] : carry[N];
 

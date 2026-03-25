@@ -37,9 +37,9 @@ module test_adder_subtractor_3bit;
   initial begin
     error_count = 0;
     $display("=====================================================================");
-    $display(" Time | Mode |  A  |  B  | Result(Bin) | C/B  | Result(Dec) | Note");
+    $display(" Time | Mode |  A  |  B  | Result(Bin) | NEG  | Result(Dec) | Note");
     $display("=====================================================================");
-    $display(" C/B : Carry for ADD, Borrow for SUB");
+    $display(" NEG : LED ON only when SUB result is negative");
 
     for (m = 0; m < 2; m = m + 1) begin
       mode = m;
@@ -59,7 +59,7 @@ module test_adder_subtractor_3bit;
 
           if (mode == 0) begin
             expected_sum = i + j;
-            expected_c_out = expected_sum[N];
+            expected_c_out = 1'b0;
             expected_dec = expected_sum;
           end else begin
             expected_sum = i - j;

@@ -19,5 +19,5 @@ set_property -dict { PACKAGE_PIN M15   IOSTANDARD LVCMOS33 } [get_ports { sum[1]
 set_property -dict { PACKAGE_PIN G14   IOSTANDARD LVCMOS33 } [get_ports { sum[2] }]; 
 set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { sum[3] }]; 
 
-## 5. 추가 캐리 출력 (RGB LED 5 - Red)
+## 5. 뺄셈 음수 결과 표시 (RGB LED 5 - Red)
 set_property -dict { PACKAGE_PIN Y11   IOSTANDARD LVCMOS33 } [get_ports { c_out }];
