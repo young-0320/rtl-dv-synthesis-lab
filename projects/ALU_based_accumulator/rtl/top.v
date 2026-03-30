@@ -12,28 +12,28 @@ module top #(
     output over
 );
 
-wire go_level;
-wire go_pulse;
+  wire go_level;
+  wire go_pulse;
 
-debouncer #(
-    .COUNT_MAX(DebounceCountMax)
-) u_go_btn (
-    .clk(clk),
-    .reset(reset),
-    .btn_in(go_btn),
-    .btn_level(go_level),
-    .btn_pulse(go_pulse)
-);
+  debouncer #(
+      .COUNT_MAX(DebounceCountMax)
+  ) u_go_btn (
+      .clk(clk),
+      .reset(reset),
+      .btn_in(go_btn),
+      .btn_level(go_level),
+      .btn_pulse(go_pulse)
+  );
 
-alu_based_accumulator u_acc (
-    .clk(clk),
-    .a(a),
-    .b(b),
-    .f(f),
-    .go_pulse(go_pulse),
-    .reset(reset),
-    .r(r),
-    .over(over)
-);
+  alu_based_accumulator u_acc (
+      .clk(clk),
+      .a(a),
+      .b(b),
+      .f(f),
+      .go_pulse(go_pulse),
+      .reset(reset),
+      .r(r),
+      .over(over)
+  );
 
 endmodule

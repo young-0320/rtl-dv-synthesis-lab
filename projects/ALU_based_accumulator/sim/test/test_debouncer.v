@@ -4,9 +4,9 @@ module test_debouncer;
 
   parameter integer COUNT_MAX = 4;
 
-  reg  clk;
-  reg  reset;
-  reg  btn_in;
+  reg clk;
+  reg reset;
+  reg btn_in;
   wire btn_level;
   wire btn_pulse;
 
@@ -32,8 +32,8 @@ module test_debouncer;
     #1;
     cycle_count = cycle_count + 1;
     if (btn_pulse) pulse_count = pulse_count + 1;
-    $display("%4d |   %b    |   %b   |   %b   |     %0d      | %s",
-             cycle_count, btn_in, btn_level, btn_pulse, pulse_count, note);
+    $display("%4d |   %b    |   %b   |   %b   |     %0d      | %s", cycle_count, btn_in, btn_level,
+             btn_pulse, pulse_count, note);
   end
 
   task automatic expect_state;
@@ -71,20 +71,24 @@ module test_debouncer;
     expect_state(1'b0, 0, "reset_state");
 
     reset = 1'b0;
-    note = "idle";
+    note  = "idle";
     repeat (2) @(posedge clk);
     #1;
     expect_state(1'b0, 0, "idle_state");
 
-    note = "press bounce";
-    btn_in = 1'b1; @(posedge clk);
-    btn_in = 1'b0; @(posedge clk);
-    btn_in = 1'b1; @(posedge clk);
-    btn_in = 1'b0; @(posedge clk);
+    note   = "press bounce";
+    btn_in = 1'b1;
+    @(posedge clk);
+    btn_in = 1'b0;
+    @(posedge clk);
+    btn_in = 1'b1;
+    @(posedge clk);
+    btn_in = 1'b0;
+    @(posedge clk);
     #1;
     expect_state(1'b0, 0, "bounce_ignored");
 
-    note = "stable high";
+    note   = "stable high";
     btn_in = 1'b1;
     repeat (8) @(posedge clk);
     #1;
@@ -95,17 +99,21 @@ module test_debouncer;
     #1;
     expect_state(1'b1, 1, "no_repeat_pulse");
 
-    note = "release bounce";
-    btn_in = 1'b0; @(posedge clk);
-    btn_in = 1'b1; @(posedge clk);
-    btn_in = 1'b0; @(posedge clk);
-    btn_in = 1'b1; @(posedge clk);
+    note   = "release bounce";
+    btn_in = 1'b0;
+    @(posedge clk);
+    btn_in = 1'b1;
+    @(posedge clk);
+    btn_in = 1'b0;
+    @(posedge clk);
+    btn_in = 1'b1;
+    @(posedge clk);
     btn_in = 1'b0;
     repeat (8) @(posedge clk);
     #1;
     expect_state(1'b0, 1, "release_without_pulse");
 
-    note = "second press";
+    note   = "second press";
     btn_in = 1'b1;
     repeat (8) @(posedge clk);
     #1;
