@@ -35,11 +35,11 @@ always @(posedge clk or posedge reset) begin
         else begin
             if (cnt == COUNT_MAX - 1) begin
                 // 일정 시간(COUNT_MAX) 동안 변한 상태가 유지되면 인정
-                btn_stable <= sync_1; 
+                btn_stable <= sync_1;
                 cnt <= 32'd0;
             end
             else begin
-                // 상태가 다르면(변했으면) 카운트 시작  
+                // 상태가 다르면(변했으면) 카운트 시작
                 cnt <= cnt + 1'b1;
             end
         end
