@@ -2,7 +2,7 @@
 
 module test_top;
 
-  localparam integer COUNT_MAX = 4;
+  parameter integer COUNT_MAX = 4;
 
   reg clk;
   reg [2:0] a;
@@ -27,7 +27,9 @@ module test_top;
   integer case_count;
   reg [8*28-1:0] note;
 
-  top uut (
+  top #(
+      .DebounceCountMax(COUNT_MAX)
+  ) uut (
       .clk(clk),
       .a(a),
       .b(b),
@@ -37,8 +39,6 @@ module test_top;
       .r(r),
       .over(over)
   );
-
-  defparam uut.u_go_btn.COUNT_MAX = COUNT_MAX;
 
   initial clk = 1'b0;
   always #5 clk = ~clk;
@@ -98,9 +98,12 @@ module test_top;
     reset = 1'b0;
     wait_clocks(2);
 
-    $display("==============================================================================================================");
-    $display("Case | R_in | O_in |  A  | Bsel |  F  | R_out | O_out | Exp_R | Exp_O | Note");
-    $display("==============================================================================================================");
+    $display({"========================================================",
+              "======================================================="});
+    $display({"Case | R_in | O_in |  A  | Bsel |  F  | R_out | O_out ",
+              "| Exp_R | Exp_O | Note"});
+    $display({"========================================================",
+              "======================================================="});
 
     for (curr_over = 0; curr_over < 2; curr_over = curr_over + 1) begin
       for (curr_r = -16; curr_r < 16; curr_r = curr_r + 1) begin
@@ -140,13 +143,17 @@ module test_top;
 
               actual_r = $signed(r);
               note = "";
-              if (func_sel == 0 && sel_b == 1 && curr_r == 15 && in_a == 7) note = "<< POS ADD OVF";
-              else if (func_sel == 2 && sel_b == 1 && curr_r == -16 && in_a == 7) note = "<< NEG MUL OVF";
+              if (func_sel == 0 && sel_b == 1 && curr_r == 15 && in_a == 7)
+                note = "<< POS ADD OVF";
+              else if (func_sel == 2 && sel_b == 1 && curr_r == -16 &&
+                       in_a == 7)
+                note = "<< NEG MUL OVF";
               else if (func_sel == 3) note = "<< HOLD CASE";
 
               case_count = case_count + 1;
               $display("%4d | %4d |  %b   | %2d |  %b   | %02b | %5d |   %b   | %5d |   %b   | %s",
-                       case_count, curr_r, curr_over[0], in_a, sel_b[0], func_sel[1:0], actual_r, over,
+                       case_count, curr_r, curr_over[0], in_a, sel_b[0],
+                       func_sel[1:0], actual_r, over,
                        expected_r, expected_over[0], note);
 
               if ((actual_r !== expected_r) || (over !== expected_over[0])) begin
@@ -182,7 +189,8 @@ module test_top;
       $display("ERROR: bounce should not trigger top-level update");
     end
 
-    $display("--------------------------------------------------------------------------------------------------------------");
+    $display({"--------------------------------------------------------",
+              "------------------------------------------------------"});
     if (error_count == 0) $display("Verification Task Completed Successfully.");
     else $display("Verification failed: %0d mismatches found.", error_count);
     $display("TEST_RESULT: %s", (error_count == 0) ? "PASS" : "FAIL");

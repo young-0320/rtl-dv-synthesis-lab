@@ -1,5 +1,7 @@
 
-module top (
+module top #(
+    parameter integer DebounceCountMax = 1000000
+) (
     input clk,
     input [2:0] a,
     input b,
@@ -14,7 +16,7 @@ wire go_level;
 wire go_pulse;
 
 debouncer #(
-    .COUNT_MAX(1000000)
+    .COUNT_MAX(DebounceCountMax)
 ) u_go_btn (
     .clk(clk),
     .reset(reset),
