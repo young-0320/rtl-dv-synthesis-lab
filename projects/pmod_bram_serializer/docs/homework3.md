@@ -48,13 +48,16 @@ ILA에 입력한 5개의 값이 40비트로 나오도록 해야함.
 
 ## 내부 신호
 
-* `ld`: `bram_dout[7:0]`을 ParToSer에 load하는 1클럭 펄스
-* `Q[7:0]`: ParToSer 내부 shift register. `ld=1`일 때 데이터가 적재되며 이후 시프트된다.
+* `clk_7M`: `clk_wiz_0`가 `clk(125MHz)`로부터 생성한 내부 동작 클럭
+* `safe_reset`: 외부 `reset` 또는 `PLL lock`이 완료되지 않았을 때 활성화되는 내부 reset 신호
+* `serializer_ld`: `bram_dout[7:0]`을 ParToSer에 load하는 1클럭 펄스
+* `serializer_shift_en`: ParToSer가 1비트씩 시프트하도록 허가하는 내부 제어 신호
+* `Q[7:0]`: ParToSer 내부 shift register. `serializer_ld=1`일 때 데이터가 적재되며 이후 `serializer_shift_en=1`일 때만 시프트된다.
 * `ila_data[39:0]`: ILA 관측용 40비트 데이터. `{x4, x3, x2, x1, x0}`
 * `bram_addr[2:0]`: BRAM 주소 (0~4)
 * `bram_din[7:0]`: BRAM에 저장할 데이터 입력
 * `bram_dout[7:0]`: BRAM에서 읽어온 데이터 출력
-* `bram_we`: Write Enable. `1`이면 해당 클럭에 `bram_din[7:0]`을 `bram_addr` 주소에 저장하고, `0`이면 읽기 모드로 동작한다.
+* `bram_wea[0:0]`: BRAM IP의 실제 Write Enable 포트. `1`이면 해당 클럭에 `bram_din[7:0]`을 `bram_addr` 주소에 저장하고, `0`이면 읽기 모드로 동작한다.
 
 ## 4. 동작
 
@@ -63,7 +66,7 @@ ILA에 입력한 5개의 값이 40비트로 나오도록 해야함.
 1. `reset`이 입력되면 시스템을 초기 상태로 복귀시킨다.
 
    1. BRAM의 write address, read address, 저장 개수 카운터, 전송 바이트 카운터, 비트 카운터를 모두 0으로 초기화한다.
-   2. `bram_we`와 `ld`는 0으로 유지한다.
+   2. `bram_wea`와 `serializer_ld`, `serializer_shift_en`은 0으로 유지한다.
    3. ParToSer 내부 레지스터 `Q[7:0]`는 0으로 초기화한다.
    4. 시스템 상태는 입력 저장 가능 상태로 복귀한다.
 2. 사용자는 브레드보드와 PMOD를 통해 8비트 병렬 입력 `X[7:0]`을 구성한다.
@@ -74,8 +77,8 @@ ILA에 입력한 5개의 값이 40비트로 나오도록 해야함.
 
    1. 저장 주소는 `bram_addr = 0 ~ 4`를 순차적으로 사용한다.
    2. 저장 시 `bram_din[7:0] = X[7:0]`으로 설정한다.
-   3. 해당 클럭에서 `bram_we = 1`로 하여 BRAM에 데이터를 기록한다.
-   4. 저장 완료 후 `bram_we = 0`으로 되돌리고, 저장 개수 카운터를 1 증가시킨다.
+   3. 해당 클럭에서 `bram_wea = 1`로 하여 BRAM에 데이터를 기록한다.
+   4. 저장 완료 후 `bram_wea = 0`으로 되돌리고, 저장 개수 카운터를 1 증가시킨다.
    5. 저장이 정상적으로 완료된 경우에만 `stored_cnt_led[2:0]`를 현재 저장 개수에 맞게 갱신한다.
    6. 저장 실패 또는 허용되지 않은 상태에서의 `save` 입력이 발생하면 `error_led`를 점등한다.
 4. 위 과정을 반복하여 총 5개의 8비트 입력값을 BRAM의 주소 `0, 1, 2, 3, 4`에 저장한다.
@@ -93,16 +96,16 @@ ILA에 입력한 5개의 값이 40비트로 나오도록 해야함.
 6. `start` 버튼의 상승 에지가 감지되면 BRAM의 데이터를 순차적으로 읽어 ParToSer에 공급한다.
 
    1. 읽기 주소는 `0 ~ 4`를 순차적으로 사용한다.
-   2. 읽기 시 `bram_we = 0`으로 두어 BRAM을 읽기 모드로 동작시킨다.
+   2. 읽기 시 `bram_wea = 0`으로 두어 BRAM을 읽기 모드로 동작시킨다.
    3. BRAM read data는 주소 인가 후 1클럭 뒤 유효하므로, FSM에 `read wait` 상태를 포함한다.
    4. 예를 들어 5개 저장 이전에 `start`가 입력되는 경우와 같은 오류 상황에서는 `error_led`를 점등한다.
-7. `bram_dout[7:0]`가 유효해지면 `ld`를 1클럭 동안 `1`로 인가하여 해당 데이터를 ParToSer에 적재한다.
+7. `bram_dout[7:0]`가 유효해지면 `serializer_ld`를 1클럭 동안 `1`로 인가하여 해당 데이터를 ParToSer에 적재한다.
 
    1. 이때 `Q[7:0] <= bram_dout[7:0]`가 된다.
    2. 직렬 출력은 `serial_out = Q[0]`으로 출력된다.
 8. 적재된 1바이트는 8클럭 동안 직렬 출력된다.
 
-   1. 각 클럭마다 `Q <= {Q[0], Q[7:1]}`로 시프트된다.
+   1. `serializer_shift_en = 1`인 동안 각 클럭마다 `Q <= {Q[0], Q[7:1]}`로 시프트된다.
    2. 따라서 출력 순서는 `LSB-first`이다.
    3. 8비트 전송이 끝나면 다음 BRAM 주소의 데이터를 다시 읽어 같은 과정을 반복한다.
 9. 위 과정을 총 5회 반복하여 BRAM에 저장된 5개의 8비트 데이터를 모두 직렬 출력한다.

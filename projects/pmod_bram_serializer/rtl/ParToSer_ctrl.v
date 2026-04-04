@@ -11,48 +11,49 @@ module ParToSer_ctrl (
 );
 
   localparam integer DEBOUNCE_COUNT_MAX = 70_000;
-  localparam integer STORED_TARGET      = 5;
+  localparam integer STORED_TARGET = 5;
 
-  localparam [2:0] S_STORE     = 3'd0;
-  localparam [2:0] S_WRITE     = 3'd1;
+  // FSM 상태 정의 
+  localparam [2:0] S_STORE = 3'd0;
+  localparam [2:0] S_WRITE = 3'd1;
   localparam [2:0] S_WAIT_START = 3'd2;
   localparam [2:0] S_READ_ADDR = 3'd3;
   localparam [2:0] S_READ_WAIT = 3'd4;
-  localparam [2:0] S_LOAD      = 3'd5;
-  localparam [2:0] S_SHIFT     = 3'd6;
-  localparam [2:0] S_DONE      = 3'd7;
+  localparam [2:0] S_LOAD = 3'd5;
+  localparam [2:0] S_SHIFT = 3'd6;
+  localparam [2:0] S_DONE = 3'd7;
 
-  reg  [2:0] state;
-  reg  [2:0] write_count;
-  reg  [2:0] read_count;
-  reg  [2:0] shift_count;
-  reg  [2:0] bram_addr;
-  reg  [7:0] bram_din;
-  reg        error_latched;
-  reg  [7:0] x0;
-  reg  [7:0] x1;
-  reg  [7:0] x2;
-  reg  [7:0] x3;
-  reg  [7:0] x4;
+  reg  [ 2:0] state;
+  reg  [ 2:0] write_count;
+  reg  [ 2:0] read_count;
+  reg  [ 2:0] shift_count;
+  reg  [ 2:0] bram_addr;
+  reg  [ 7:0] bram_din;
+  reg         error_latched;
+  reg  [ 7:0] x0;
+  reg  [ 7:0] x1;
+  reg  [ 7:0] x2;
+  reg  [ 7:0] x3;
+  reg  [ 7:0] x4;
 
-  wire [7:0] serializer_q;
-  wire [7:0] bram_dout;
+  wire [ 7:0] serializer_q;
+  wire [ 7:0] bram_dout;
   wire [39:0] ila_data;
-  wire [0:0] bram_wea;
-  wire clk_7M;
-  wire pll_locked;
-  wire safe_reset;
-  wire save_pulse;
-  wire start_pulse;
-  wire serializer_ld;
-  wire serializer_shift_en;
+  wire [ 0:0] bram_wea;
+  wire        clk_7M;
+  wire        pll_locked;
+  wire        safe_reset;
+  wire        save_pulse;
+  wire        start_pulse;
+  wire        serializer_ld;
+  wire        serializer_shift_en;
 
   assign safe_reset          = reset | ~pll_locked;
   assign stored_cnt_led      = write_count;
   assign ready_led           = (state == S_WAIT_START);
   assign error_led           = error_latched;
   assign ila_data            = {x4, x3, x2, x1, x0};
-  assign bram_wea           = (state == S_WRITE) ? 1'b1 : 1'b0;
+  assign bram_wea            = (state == S_WRITE) ? 1'b1 : 1'b0;
   assign serializer_ld       = (state == S_LOAD);
   assign serializer_shift_en = (state == S_SHIFT);
 
@@ -77,13 +78,13 @@ module ParToSer_ctrl (
   );
 
   ParToSer i_serializer (
-      .X        (bram_dout),
-      .clk      (clk_7M),
-      .reset    (safe_reset),
-      .ld       (serializer_ld),
-      .shift_en (serializer_shift_en),
+      .X         (bram_dout),
+      .clk       (clk_7M),
+      .reset     (safe_reset),
+      .ld        (serializer_ld),
+      .shift_en  (serializer_shift_en),
       .serial_out(serial_out),
-      .Q        (serializer_q)
+      .Q         (serializer_q)
   );
 
   blk_mem_gen_0 i_bram (
@@ -106,6 +107,8 @@ module ParToSer_ctrl (
       .clk_out1(clk_7M),
       .locked  (pll_locked)
   );
+  // FSM 구현
+  // 리셋 -> 저장 대기 -> BRAM 쓰기 -> start 대기 -> BRAM 읽기 -> serializer load -> shift -> 완료
 
   always @(posedge clk_7M or posedge safe_reset) begin
     if (safe_reset) begin
@@ -146,7 +149,8 @@ module ParToSer_ctrl (
             3'd2: x2 <= bram_din;
             3'd3: x3 <= bram_din;
             3'd4: x4 <= bram_din;
-            default: begin end
+            default: begin
+            end
           endcase
 
           if (write_count == STORED_TARGET - 1) begin
