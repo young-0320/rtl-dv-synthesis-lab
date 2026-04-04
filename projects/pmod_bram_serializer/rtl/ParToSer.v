@@ -7,11 +7,11 @@ module ParToSer (
     input clk,
     input reset,
     input ld,
-    output out,
+    output serial_out,
     output reg [7:0] Q
 );
 
-  assign out = Q[0];
+  assign serial_out = Q[0];
   always @(posedge clk) begin
     if (reset) begin
       Q <= 8'b00000000;
