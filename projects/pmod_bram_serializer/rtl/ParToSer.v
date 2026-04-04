@@ -7,6 +7,7 @@ module ParToSer (
     input clk,
     input reset,
     input ld,
+    input shift_en,
     output serial_out,
     output reg [7:0] Q
 );
@@ -17,8 +18,10 @@ module ParToSer (
       Q <= 8'b00000000;
     end else if (ld) begin
       Q <= X;
-    end else begin
+    end else if (shift_en) begin
       Q <= {Q[0], Q[7:1]};
+    end else begin
+      Q <= Q;
     end
   end
 endmodule
