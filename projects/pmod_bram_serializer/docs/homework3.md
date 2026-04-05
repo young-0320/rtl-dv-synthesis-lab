@@ -2,6 +2,9 @@
 
 ## 📅 마감 기한: 2026년 4월 10일 10:30
 
+
+시연 영상 링크: https://youtu.be/vsxncSsmpLg
+
 ## 1. 설계 사양
 
 PMOD를 사용한 ParToSer 완성하고
