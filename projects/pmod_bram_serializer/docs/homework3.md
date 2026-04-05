@@ -110,10 +110,10 @@ ILA에 입력한 5개의 값이 40비트로 나오도록 해야함.
    3. 8비트 전송이 끝나면 다음 BRAM 주소의 데이터를 다시 읽어 같은 과정을 반복한다.
 9. 위 과정을 총 5회 반복하여 BRAM에 저장된 5개의 8비트 데이터를 모두 직렬 출력한다.
 10. 모든 데이터 전송이 완료되면 시스템은 완료 상태를 거쳐 초기 상태로 복귀한다.
-   1. write/read address와 각종 카운터를 초기화한다.
-   2. 필요 시 ParToSer 내부 레지스터도 초기화한다.
-   3. `ready_led`, `error_led`, `stored_cnt_led[2:0]`도 초기 상태에 맞게 갱신한다.
-   4. 이후 다시 새로운 5개의 입력을 저장할 수 있는 기본 상태로 돌아간다.
+11. write/read address와 각종 카운터를 초기화한다.
+12. 필요 시 ParToSer 내부 레지스터도 초기화한다.
+13. `ready_led`, `error_led`, `stored_cnt_led[2:0]`도 초기 상태에 맞게 갱신한다.
+14. 이후 다시 새로운 5개의 입력을 저장할 수 있는 기본 상태로 돌아간다.
 
 ---
 
@@ -125,23 +125,68 @@ Zybo Z7-20 보드 사용
 
 PMOD JE는 표준 Pmod 포트이므로 데이터 핀은 `1, 2, 3, 4, 7, 8, 9, 10`이고, `5`와 `11`은 GND, `6`과 `12`는 3.3V 전원 핀이다. 따라서 `X[7:0]`은 JE의 8개 데이터 핀에만 연결하며, 현재 설계에서는 `JE1 -> X[0]`, `JE2 -> X[1]`, ..., `JE10 -> X[7]`의 순서로 사용한다.
 
-| **분류** | **신호명**      | **하드웨어 핀 (Zybo)**  | **비고**                     |
-| -------------- | --------------------- | ----------------------------- | ---------------------------------- |
-| **입력** | `clk`               | **sysclk (K17)**        | 시스템 클럭 125MHz                 |
-| **입력** | `reset`             | **BTN0 (K18)**          | 시스템 초기화                      |
-| **입력** | `save`              | **BTN1 (P16)**          | 현재 `X[7:0]` 값을 BRAM에 저장   |
-| **입력** | `start`             | **BTN2 (K19)**          | 저장된 5개 데이터를 직렬 출력 시작 |
-| **입력** | `X[0]`              | **JE1 (V12)**           | PMOD JE 입력 bit 0                 |
-| **입력** | `X[1]`              | **JE2 (W16)**           | PMOD JE 입력 bit 1                 |
-| **입력** | `X[2]`              | **JE3 (J15)**           | PMOD JE 입력 bit 2                 |
-| **입력** | `X[3]`              | **JE4 (H15)**           | PMOD JE 입력 bit 3                 |
-| **입력** | `X[4]`              | **JE7 (V13)**           | PMOD JE 입력 bit 4                 |
-| **입력** | `X[5]`              | **JE8 (U17)**           | PMOD JE 입력 bit 5                 |
-| **입력** | `X[6]`              | **JE9 (T17)**           | PMOD JE 입력 bit 6                 |
-| **입력** | `X[7]`              | **JE10 (Y17)**          | PMOD JE 입력 bit 7                 |
-| **출력** | `serial_out`        | **LD0 (M14)**           | 1비트 직렬 출력 관측용 LED         |
-| **출력** | `stored_cnt_led[0]` | **LD1 (M15)**           | 저장 성공 개수 표시 bit 0          |
-| **출력** | `stored_cnt_led[1]` | **LD2 (G14)**           | 저장 성공 개수 표시 bit 1          |
-| **출력** | `stored_cnt_led[2]` | **LD3 (D18)**           | 저장 성공 개수 표시 bit 2          |
-| **출력** | `ready_led`         | **RGB LED5 Green (T5)** | 5개 저장 완료 후 점등              |
+| **분류** | **신호명**      | **하드웨어 핀 (Zybo)**  | **비고**                          |
+| -------------- | --------------------- | ----------------------------- | --------------------------------------- |
+| **입력** | `clk`               | **sysclk (K17)**        | 시스템 클럭 125MHz                      |
+| **입력** | `reset`             | **BTN0 (K18)**          | 시스템 초기화                           |
+| **입력** | `save`              | **BTN1 (P16)**          | 현재 `X[7:0]` 값을 BRAM에 저장        |
+| **입력** | `start`             | **BTN2 (K19)**          | 저장된 5개 데이터를 직렬 출력 시작      |
+| **입력** | `X[0]`              | **JE1 (V12)**           | PMOD JE 입력 bit 0                      |
+| **입력** | `X[1]`              | **JE2 (W16)**           | PMOD JE 입력 bit 1                      |
+| **입력** | `X[2]`              | **JE3 (J15)**           | PMOD JE 입력 bit 2                      |
+| **입력** | `X[3]`              | **JE4 (H15)**           | PMOD JE 입력 bit 3                      |
+| **입력** | `X[4]`              | **JE7 (V13)**           | PMOD JE 입력 bit 4                      |
+| **입력** | `X[5]`              | **JE8 (U17)**           | PMOD JE 입력 bit 5                      |
+| **입력** | `X[6]`              | **JE9 (T17)**           | PMOD JE 입력 bit 6                      |
+| **입력** | `X[7]`              | **JE10 (Y17)**          | PMOD JE 입력 bit 7                      |
+| **출력** | `serial_out`        | **LD0 (M14)**           | 1비트 직렬 출력 관측용 LED              |
+| **출력** | `stored_cnt_led[0]` | **LD1 (M15)**           | 저장 성공 개수 표시 bit 0               |
+| **출력** | `stored_cnt_led[1]` | **LD2 (G14)**           | 저장 성공 개수 표시 bit 1               |
+| **출력** | `stored_cnt_led[2]` | **LD3 (D18)**           | 저장 성공 개수 표시 bit 2               |
+| **출력** | `ready_led`         | **RGB LED5 Green (T5)** | 5개 저장 완료 후 점등                   |
 | **출력** | `error_led`         | **RGB LED5 Red (Y11)**  | 잘못된 입력 또는 예외 상황 발생 시 점등 |
+
+---
+
+## 6. JTAG / ILA 디버깅 주의사항
+
+이번 설계는 ILA와 debug hub가 내부 동작 클럭 `clk_7M`에 연결되어 있다. 따라서 Vivado Hardware Manager가 JTAG를 통해 ILA를 제어할 때, JTAG 클럭이 너무 빠르면 ILA가 불안정하게 동작할 수 있다.
+
+`JTAG`는 FPGA와 PC 사이를 연결하는 디버깅 및 프로그램용 직렬 인터페이스이다. Vivado는 JTAG를 통해 bitstream을 FPGA에 다운로드하고, ILA/debug hub와 통신하여 내부 신호를 읽거나 trigger를 제어한다.
+
+### 왜 문제가 생기는가
+
+Vivado의 기본 JTAG 주파수는 보통 `15 MHz`로 잡히는데, 본 설계의 ILA/debug hub는 약 `7 MHz`의 `clk_7M`을 사용한다. 이 경우 JTAG가 내부 debug hub clock보다 너무 빨라져 다음과 같은 문제가 발생할 수 있다.
+
+* `Program Device` 시 `.ltx` mismatch 또는 ILA probe 관련 오류 발생
+* ILA 파형 창은 열리지만 trigger가 제대로 걸리지 않음
+* 어제는 되던 capture가 오늘은 안 되는 식으로 동작이 불안정해 보임
+* bitstream만 올리면 정상인데 `.ltx`를 같이 쓰면 오류가 발생함
+
+AMD Vivado 가이드에서는 JTAG clock이 debug hub clock보다 최소 2.5배 이상 느려야 안정적이라고 안내한다. 본 설계의 debug hub clock이 약 `7 MHz`이므로, 안전한 JTAG 상한은 대략 `7 / 2.5 = 2.8 MHz` 이하이다. 따라서 `1 MHz`로 낮추면 충분한 여유를 확보할 수 있어 ILA 연결과 capture가 안정된다.
+
+### 왜 1 MHz로 설정하면 되는가
+
+`1 MHz`는 `clk_7M`보다 충분히 느리므로 debug hub와 JTAG 간 통신 타이밍이 안정된다. 즉, 회로 기능이 바뀌는 것이 아니라 Vivado가 하드웨어 안의 ILA를 더 안정적으로 읽고 제어할 수 있게 되는 것이다.
+
+### Vivado Tcl 명령어
+
+하드웨어 연결 후 Tcl Console에서 아래 순서로 JTAG 속도를 `1 MHz`로 낮춘다.
+
+```tcl
+open_hw_manager
+connect_hw_server
+current_hw_target [lindex [get_hw_targets] 0]
+close_hw_target
+set_property PARAM.FREQUENCY 1000000 [current_hw_target]
+open_hw_target
+get_property PARAM.FREQUENCY [current_hw_target]
+```
+
+마지막 명령의 출력이 `1000000`이면 정상적으로 적용된 것이다.
+
+### 사용 시 주의
+
+* JTAG 속도 변경은 하드웨어 target 연결 설정이므로, Vivado를 다시 열거나 하드웨어를 재연결하면 다시 기본값으로 돌아갈 수 있다.
+* ILA를 사용할 때는 하드웨어를 연결한 직후 먼저 JTAG 속도를 `1 MHz`로 설정한 뒤 bitstream과 `.ltx`를 프로그램하는 것이 안전하다.
+* 본 설계에서 ILA의 `probe0`는 BRAM 내부 셀을 직접 보는 신호가 아니라, 저장 시점에 갱신되는 `ila_data[39:0] = {x4, x3, x2, x1, x0}` 관측용 레지스터 묶음이다. 따라서 `start` 전에도 저장된 값이 ILA에 보일 수 있다.
