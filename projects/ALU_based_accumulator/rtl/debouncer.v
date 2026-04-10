@@ -23,7 +23,7 @@ module debouncer #(
       btn_level    <= 1'b0;
       btn_pulse    <= 1'b0;
     end else begin
-      // 1) 동기화
+      // 1) 2-FF synchronizer 
       sync_0 <= btn_in;
       sync_1 <= sync_0;
 
