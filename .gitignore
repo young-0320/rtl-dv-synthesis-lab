@@ -37,6 +37,9 @@
 *.out
 *.app
 
+# CMake/build outputs
+/build/
+
 # debug information files
 *.dwo
 
